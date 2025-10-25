@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ROMA — Психодел</title>
+
+  <!-- Шрифты -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-1: #130f40;
+      --bg-2: #4a00e0;
+      --accent1: #ff007f;
+      --accent2: #00fff0;
+      --accent3: #ffd500;
+      --glass: rgba(255,255,255,0.06);
+      --neon-shadow: 0 0 8px rgba(255,255,255,0.06), 0 0 30px rgba(0,255,240,0.06);
+      --max-width: 1200px;
+    }
+
+    /* Базовая стилизация */
+    *{box-sizing: border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(255,0,200,0.06), transparent 8%),
+                  radial-gradient(900px 400px at 90% 90%, rgba(0,255,200,0.04), transparent 10%),
+                  linear-gradient(135deg,var(--bg-1), var(--bg-2));
+      color:#fff;
+      overflow-x:hidden;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      --safe-pad: 18px;
+    }
+
+    /* Анимированный плавный градиент фона */
+    @keyframes hueShift {
+      0% { filter: hue-rotate(0deg) saturate(110%); }
+      50% { filter: hue-rotate(40deg) saturate(140%); }
+      100% { filter: hue-rotate(0deg) saturate(110%); }
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background: conic-gradient(from 0deg at 50% 50%, rgba(255,0,127,0.06), rgba(0,255,240,0.06), rgba(255,213,0,0.04), rgba(255,0,127,0.06));
+      mix-blend-mode: overlay;
+      opacity:0.9;
+      animation: hueShift 16s linear infinite;
+      z-index:0;
+    }
+
+    /* Плавающие цветные "блюбы" */
+    .blob{
+      position:fixed;
+      border-radius:50%;
+      filter: blur(40px);
+      opacity:0.9;
+      mix-blend-mode: screen;
+      transform: translate3d(0,0,0);
+      z-index:0;
+      animation: float 10s ease-in-out infinite;
+    }
+    .blob.b1{width:420px;height:420px;left:-120px;top:-80px;background: radial-gradient(circle at 30% 30%, var(--accent1), transparent 40%);}
+    .blob.b2{width:340px;height:340px;right:-80px;bottom:-40px;background: radial-gradient(circle at 70% 70%, var(--accent2), transparent 40%); animation-duration:12s;}
+    .blob.b3{width:220px;height:220px;left:20%;bottom:20%;background: radial-gradient(circle at 50% 40%, var(--accent3), transparent 40%); animation-duration:14s;}
+    @keyframes float{
+      0%{transform: translateY(0) scale(1)}
+      50%{transform: translateY(-30px) scale(1.03)}
+      100%{transform: translateY(0) scale(1)}
+    }
+
+    /* Контейнер */
+    .wrap{
+      position:relative;
+      z-index:2;
+      max-width:var(--max-width);
+      margin: 0 auto;
+      padding: 12px var(--safe-pad) 80px;
+    }
+
+    /* Минималистичный, но неон-хедер */
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+      padding:6px 12px;
+      border-radius:12px;
+      backdrop-filter: blur(6px) saturate(120%);
+      box-shadow: 0 6px 30px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.02) inset;
+      position:sticky;
+      top:12px;
+      z-index:6;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .logo{
+      width:36px;height:36px;border-radius:8px;
+      display:inline-grid;place-items:center;
+      font-family:"Orbitron",sans-serif;
+      font-weight:700;
+      background: linear-gradient(135deg,var(--accent1),var(--accent2));
+      color:#050505;
+      box-shadow: 0 2px 14px rgba(255,0,127,0.24), 0 2px 30px rgba(0,255,240,0.14);
+      transform: rotate(-6deg);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .brand h1{
+      margin:0;font-size:18px;letter-spacing:1px;
+      font-family:"Orbitron",sans-serif;
+      text-transform:uppercase;
+      background: linear-gradient(90deg,var(--accent2),var(--accent1),var(--accent3));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow: 0 0 10px rgba(0,255,240,0.09);
+    }
+
+    /* Меню / бургер для мобилок */
+    .nav{
+      display:flex;gap:8px;align-items:center;
+      flex-wrap:wrap;
+    }
+    .nav .btn{
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);
+      cursor:pointer;color:#fff;font-weight:600;font-size:13px;
+      transition:transform .18s ease, box-shadow .18s ease;
+      letter-spacing:0.6px;
+    }
+    .nav .btn:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+    .burger{
+      display:none;
+      width:44px;height:36px;border-radius:9px;background:linear-gradient(90deg, rgba(0,0,0,0.25), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.03);
+      display:grid;place-items:center;cursor:pointer;
+    }
+
+    /* Главный большой герой-блок */
+    .hero{
+      margin-top:26px;
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:28px;
+      align-items:center;
+      padding:28px;
+      border-radius:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+      border:1px solid rgba(255,255,255,0.03);
+      overflow:hidden;
+    }
+
+    .hero .left{
+      padding-right:8px;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      font-size:13px;
+      padding:6px 10px;border-radius:999px;
+      background:linear-gradient(90deg,var(--accent1),var(--accent2));
+      color:#050505;font-weight:700;
+      box-shadow: 0 8px 30px rgba(255,0,127,0.12);
+      margin-bottom:12px;
+      transform:translateX(-4px) rotate(-2deg);
+    }
+
+    .title{
+      font-family:"Orbitron",sans-serif;
+      font-size:64px;line-height:0.9;margin:0 0 12px;
+      background: linear-gradient(90deg, #fff, var(--accent2), var(--accent1));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      text-shadow: 0 6px 40px rgba(0,0,0,0.6), 0 0 30px rgba(255,0,127,0.06);
+      letter-spacing: -1px;
+    }
+
+    /* Разноцветные подсветки для title */
+    .title strong{display:inline-block;padding:4px 10px;border-radius:8px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));}
+
+    .subtitle{
+      font-size:16px;color:rgba(255,255,255,0.86);max-width:60ch;
+      margin-bottom:18px;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.45);
+    }
+
+    .cta{
+      display:flex;gap:12px;flex-wrap:wrap;
+    }
+    .cta .primary{
+      padding:12px 18px;border-radius:12px;font-weight:700;
+      background: linear-gradient(90deg,var(--accent2),var(--accent1));
+      color:#050505;border:none;cursor:pointer;box-shadow: 0 10px 40px rgba(0,255,240,0.12);
+      transform: translateZ(0);
+    }
+    .cta .ghost{
+      padding:10px 14px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,0.14);
+      color:#fff;font-weight:600;cursor:pointer;
+    }
+
+    .hero .right{
+      display:grid;place-items:center;
+    }
+    .hero .avatar{
+      width:360px;height:360px;border-radius:18px;overflow:hidden;border:4px solid rgba(255,255,255,0.04);
+      box-shadow: 0 30px 70px rgba(0,0,0,0.6), 0 6px 30px rgba(255,0,127,0.06);
+      transform: rotate(-6deg) scale(1);
+      transition: transform .6s cubic-bezier(.2,.9,.3,1);
+      background:linear-gradient(120deg,var(--accent1),var(--accent2));
+      display:grid;place-items:center;
+    }
+    .hero .avatar img{width:100%;height:100%;object-fit:cover;display:block;mix-blend-mode:screen}
+
+    .hero .avatar:hover{transform: rotate(-2deg) scale(1.02)}
+
+    /* Секции контента */
+    .section{
+      margin-top:28px;
+      padding:22px;
+      border-radius:16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));
+      border:1px solid rgba(255,255,255,0.02);
+      box-shadow: 0 8px 36px rgba(0,0,0,0.45);
+      overflow:hidden;
+    }
+
+    .section h2{
+      font-family:"Orbitron",sans-serif;font-size:34px;margin:0 0 12px;
+      background:linear-gradient(90deg,var(--accent3),var(--accent1),var(--accent2));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      text-shadow: 0 4px 30px rgba(0,0,0,0.45);
+    }
+
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:20px;
+      align-items:start;
+    }
+
+    .card{
+      border-radius:12px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+      border:1px solid rgba(255,255,255,0.02);
+    }
+
+    .card .muted{color:rgba(255,255,255,0.78);line-height:1.6;font-size:15px}
+
+    .card.dark{background:linear-gradient(180deg, rgba(0,0,0,0.22), rgba(0,0,0,0.28)); color:#fff}
+
+    .card img{width:100%;border-radius:10px;display:block}
+
+    /* Параллакс лёгкий — используя data-parallax attribute */
+    [data-parallax]{transition:transform .15s ease-out}
+
+    /* Footer */
+    footer{
+      margin-top:40px;text-align:center;padding:18px 6px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.03));
+      border:1px solid rgba(255,255,255,0.02);
+    }
+
+    /* Анимации появления при скролле (используем классы from-left/from-right/zoom) */
+    .reveal{opacity:0;transform:translateY(24px) scale(.98);transition: all .9s cubic-bezier(.2,.9,.3,1)}
+    .reveal.visible{opacity:1;transform:translateY(0) scale(1)}
+
+    .from-left{transform:translateX(-30px) scale(.98)}
+    .from-right{transform:translateX(30px) scale(.98)}
+    .zoom{transform:scale(.96);}
+
+    /* MEDIA QUERIES — Адаптивность */
+    @media (max-width: 1000px){
+      .hero,.split{grid-template-columns:1fr 320px}
+      .hero .avatar{width:300px;height:300px}
+    }
+
+    @media (max-width: 820px){
+      .logo{width:32px;height:32px;font-size:12px}
+      .title{font-size:44px}
+      .hero{grid-template-columns:1fr; padding:18px}
+      .split{grid-template-columns:1fr}
+      .hero .avatar{width:100%;height:260px}
+      .nav .btn{display:none}
+      .burger{display:grid}
+      .nav.mobile-open .btn{display:block;width:100%}
+    }
+
+    @media (max-width:480px){
+      .title{font-size:34px}
+      .eyebrow{font-size:12px;padding:5px 8px}
+      .brand h1{font-size:14px}
+      header{padding:6px}
+      .wrap{padding-left:12px;padding-right:12px}
+    }
+
+    /* Небольшая эстетическая мелочь: текстовые градиенты для ссылок */
+    a.gradient{
+      background:linear-gradient(90deg,var(--accent1),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;
+      text-decoration:none;font-weight:700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- плавящиеся блюбы -->
+  <div class="blob b1" aria-hidden="true"></div>
+  <div class="blob b2" aria-hidden="true"></div>
+  <div class="blob b3" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <!-- HEADER -->
+    <header role="banner" aria-label="Главная шапка">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">R</div>
+        <h1>ROMA</h1>
+      </div>
+
+      <nav class="nav" id="nav" aria-label="Главная навигация">
+        <div class="btn" role="button" tabindex="0" onclick="scrollToDiv('bio')">БИОГРАФИЯ</div>
+        <div class="btn" role="button" tabindex="0" onclick="scrollToDiv('int')">ИНТЕРЕСЫ</div>
+        <div class="btn" role="button" tabindex="0" onclick="scrollToDiv('auth')">АВТОР</div>
+        <div class="btn" role="button" tabindex="0" onclick="scrollToDiv('cont')">КОНТАКТЫ</div>
+        <div class="burger" id="burger" aria-label="Меню" title="Открыть меню" role="button">
+          <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="20" height="2" rx="1" fill="white" opacity="0.95"/>
+            <rect y="6" width="20" height="2" rx="1" fill="white" opacity="0.95"/>
+            <rect y="12" width="12" height="2" rx="1" fill="white" opacity="0.95"/>
+          </svg>
+        </div>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <main>
+      <section class="hero reveal from-left" data-parallax>
+        <div class="left">
+          <div class="eyebrow">Психоделическая биография</div>
+          <h2 class="title"><strong>РОМА</strong><br><span style="font-size:.6em;opacity:.92">— легенда, вайб, хаос</span></h2>
+          <p class="subtitle">Экспериментальный портал о Роме: ярко, громко, странно. Здесь текст превращается в свечение, а фото — в портал. Погружайся в психоделию, но береги глаза.</p>
+
+          <div class="cta">
+            <button class="primary" onclick="scrollToDiv('bio')">Читать биографию</button>
+            <button class="ghost" onclick="scrollToDiv('int')">Интересы</button>
+          </div>
+        </div>
+
+        <div class="right" data-parallax>
+          <div class="avatar">
+            <!-- используем существующий файл roma.jpg -->
+            <img src="roma.jpg" alt="Рома">
+          </div>
+        </div>
+      </section>
+
+      <!-- BIO SECTION -->
+      <section id="bio" class="section reveal from-right">
+        <h2>Биография</h2>
+        <div class="split">
+          <div class="card">
+            <p class="muted">Рома, 16 лет. Проживает в Словакии. Активный участник чата "Одмен чата умир". Коротко: немного сумбурный, слегка мудрёный, но живёт в кайф. Путешествовал: Египет и ещё несколько мест. Как друг — 6/10, но зато со своим характером и атмосферой.</p>
+            <hr style="opacity:.06;margin:16px 0;border:none;border-top:1px solid rgba(255,255,255,0.04)">
+            <p class="muted"><strong>Статус:</strong> живёт с мамой, работает, тусит в чатах и катится по жизни.</p>
+          </div>
+
+          <div class="card card-right">
+            <img src="roma.jpg" alt="Рома крупно">
+            <p style="margin-top:12px;font-weight:700;color:rgba(255,255,255,0.92)">Легенда локального масштаба</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- INTERESTS -->
+      <section id="int" class="section reveal from-left">
+        <h2>Интересы</h2>
+        <div class="split">
+          <div class="card card-dark">
+            <p class="muted">Любит кататься на самокате, общаться в чатах, недавно заинтересовался ставками (влияние крутых людей из группы), работал доставщиком. Раньше искал общение через дайвинчик, потом отказался от идеи.</p>
+            <p style="margin-top:12px;font-weight:700;color:var(--accent2)">Хобби: самокат, чаты, "вирусные" идеи.</p>
+          </div>
+
+          <div class="card dark">
+            <img src="samokat.jpg" alt="Самокат">
+          </div>
+        </div>
+      </section>
+
+      <!-- AUTHOR -->
+      <section id="auth" class="section reveal zoom">
+        <h2>Автор сайта</h2>
+        <div class="split">
+          <div class="card">
+            <p class="muted">Матвей — автор и фронтенд-мастер этого психоделического портала. Код написан с любовью к визуальному шуму, градиентам и анимациям.</p>
+            <p style="margin-top:12px;font-weight:700;color:var(--accent1)">Роль: разработчик, дизайнер, провокатор интерфейсов</p>
+          </div>
+
+          <div class="card dark">
+            <img src="matvey.jpg" alt="Матвей">
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACTS -->
+      <section id="cont" class="section reveal from-right">
+        <h2>Контакты</h2>
+        <div class="split">
+          <div class="card dark">
+            <p style="font-weight:700;color:var(--accent3)">Где найти Рому?</p>
+            <p class="muted">Телеграм: <a class="gradient" href="https://t.me/foxinventor" target="_blank" rel="noopener noreferrer">@foxinventor</a><br>Пиши — отвечает (если в настроении 😎)</p>
+            <div style="margin-top:12px">
+              <img src="image.png" alt="QR / image" style="width:100%;border-radius:10px">
+            </div>
+          </div>
+
+          <div class="card">
+            <p class="muted">Если хочешь — могу добавить форму обратной связи, карту мест, дополнительные анимации или сделать отдельную страницу-галерею с фотографиями и глитч-эффектами.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        &copy; 2025 ROMA — психоделический портал. Сделано с градиентами и шумом.
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Скрипт: бургер + мобильное меню
+    const burger = document.getElementById('burger');
+    const nav = document.getElementById('nav');
+    let mobileOpen = false;
+    burger && burger.addEventListener('click', e => {
+      mobileOpen = !mobileOpen;
+      if(mobileOpen){
+        nav.classList.add('mobile-open');
+        burger.style.transform = 'rotate(90deg)';
+      } else {
+        nav.classList.remove('mobile-open');
+        burger.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    // Скролл к секции
+    function scrollToDiv(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 18 - 60; // учёт шапки
+      window.scrollTo({top, behavior:'smooth'});
+    }
+
+    // Параллакс: двигаем элементы чуть-чуть при скролле
+    const parallaxEls = document.querySelectorAll('[data-parallax]');
+    window.addEventListener('scroll', () => {
+      const st = window.scrollY;
+      parallaxEls.forEach((el,i) => {
+        const speed = 0.06 + i*0.02;
+        el.style.transform = `translateY(${st * speed}px)`;
+      });
+
+      // лёгкое вращение блюбов
+      document.querySelectorAll('.blob').forEach((b, idx) => {
+        b.style.transform = `translateY(${Math.sin((st/200)+(idx*1.2))*18}px)`;
+      });
+    }, {passive:true});
+
+    // IntersectionObserver для reveal-анимаций
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if(e.isIntersecting){
+          e.target.classList.add('visible');
+        }
+      });
+    }, {threshold: 0.18});
+
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Небольшая оптимизация — уменьшение анимаций на слабых устройствах
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if(mq.matches){
+      document.querySelectorAll('.reveal').forEach(s => {
+        s.style.transition = 'none';
+        s.classList.add('visible');
+      });
+      document.querySelectorAll('.blob').forEach(b => b.style.display='none');
+    }
+  </script>
+</body>
+</html>
